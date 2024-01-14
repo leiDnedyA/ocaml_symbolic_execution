@@ -1,0 +1,4 @@
+(executable
+ (public_name symbolic_execution)
+ (name main)
+ (libraries symbolic_execution))
