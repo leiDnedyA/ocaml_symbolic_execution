@@ -1,2 +1,3 @@
 (library
- (name symbolic_execution))
+ (name symbolic_execution)
+ (libraries z3))
