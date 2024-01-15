@@ -1,6 +1,6 @@
 open Lib;;
 
-let result = eval_bool (Not (Value (Bool true)));;
+let result = eval_bool (Gte ((Val (Int 0)), (Val (Int 1))));;
 
 let extract_bool v =
   match v with
