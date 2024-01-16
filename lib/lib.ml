@@ -71,3 +71,14 @@ let eval_stmt env pc stmt = (*env -> hashtable, pc -> program counter (line numb
       | _ -> failwith("Invalid boolean result")
       )
   | Goto (goto_pc) -> goto_pc
+;;
+
+
+(* Programs *)
+
+let rec eval_prgm env pc (prgm:stmt list) = 
+  if (pc >= List.length prgm) then
+    0
+  else
+    eval_prgm env (eval_stmt env pc (List.nth prgm pc)) prgm
+;;
