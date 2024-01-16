@@ -1,11 +1,13 @@
 open Z3;;
 include Types;;
 
+
 (* Aliases / helper functions *)
 
 let mk_numeral mk i = Z3.Arithmetic.Integer.mk_numeral_i mk i;;
 
 let int_expr i = Val(Int(i));;
+
 
 (* Expressions *)
 
@@ -51,10 +53,26 @@ let rec z3_expr_of_expr expr env mk =
 
 let eval_expr expr env =
   let mk = mk_context [] in
-  Z3.Expr.to_string (solve_z3_expr (z3_expr_of_expr expr env mk) mk);;
+    let result = Z3.Expr.to_string (solve_z3_expr (z3_expr_of_expr expr env mk) mk) in
+    match result with
+    | "true" -> Bool(true)
+    | "false" -> Bool(false)
+    | _ -> Int(int_of_string result)
+;;
 
 let eval_expr_int expr env =
-  int_of_string (eval_expr expr env);;
+  let int_val = eval_expr expr env in
+    match int_val with
+    | Int i -> i
+    | _ -> failwith("expressions passed to eval_expr_int must evaluate to Int values, not Bools")
+;;
+
+let eval_expr_bool expr env =
+  let bool_val = eval_expr expr env in
+    match bool_val with
+    | Bool b -> b
+    | _ -> failwith("expressions passed to eval_expr_bool must evaluate to Bool values, not Int")
+;;
 
 (* Statements *)
 
@@ -66,8 +84,8 @@ let eval_stmt env pc stmt = (*env -> hashtable, pc -> program counter (line numb
   | If (expr, if_pc) ->
       (
       match (eval_expr expr env) with
-      | "true" -> if_pc
-      | "false" -> pc + 1
+      | Bool(true) -> if_pc
+      | Bool(false) -> pc + 1
       | _ -> failwith("Invalid boolean result")
       )
   | Goto (goto_pc) -> goto_pc

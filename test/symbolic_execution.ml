@@ -40,3 +40,15 @@ let prgm = [
   ] in
 eval_prgm env_2 0 prgm;;
 run_test ((Hashtbl.find env_2 "x") = 3) 5;;
+
+(* Test 6, int expressions*)
+let env = Hashtbl.create 1 in
+let test_expr = Add(int_expr 1, Div(int_expr 10, int_expr 2)) in
+let result = eval_expr_int test_expr env in
+run_test (result = 6) 6;;
+
+(* Test 7, int expressions*)
+let env = Hashtbl.create 1 in
+let test_expr = And(Gt(int_expr 3, int_expr 1), Or(Val(Bool(true)), Val(Bool(false)))) in
+let result = eval_expr_bool test_expr env in
+run_test (result = true) 7;;
