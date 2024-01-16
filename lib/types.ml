@@ -5,6 +5,7 @@ type value =
 ;;
 
 type expr =
+  | Var of string 
   | Val of value
   (* Algebra *)
   | Add of expr * expr
@@ -23,3 +24,8 @@ type expr =
   | Or of expr * expr
 ;;
 
+type stmt =
+  | Assign of string * expr
+  | If of expr * int
+  | Goto of int 
+;;

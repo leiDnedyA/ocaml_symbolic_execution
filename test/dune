@@ -1,2 +1,3 @@
 (test
- (name symbolic_execution))
+ (name symbolic_execution)
+ (libraries lib))
