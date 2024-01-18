@@ -8,6 +8,7 @@ let mk_numeral mk i = Z3.Arithmetic.Integer.mk_numeral_i mk i;;
 
 let int_expr i = Val(Int(i));;
 
+let empty_context = mk_context [];;
 
 (* Expressions *)
 
@@ -21,13 +22,15 @@ let solve_z3_bool_expr expr mk =
 let solve_z3_expr expr mk =
   let solver = (Solver.mk_simple_solver mk) in
     let model = Option.get (Solver.get_model solver) in
-    (Option.get (Model.eval model expr true));;
+      (Option.get (Model.eval model expr true));;
 
 let rec z3_expr_of_expr expr env mk =
   match expr with
   | Val v -> (match v with
     | Bool b -> Z3.Boolean.mk_val mk b
-    | Int n -> mk_numeral mk n)
+    | Int n -> mk_numeral mk n
+    | Sym s -> Z3.Arithmetic.Integer.mk_const_s mk s
+    )
   | Var v -> mk_numeral mk (Hashtbl.find env v)
   | And (x, y) -> Z3.Boolean.mk_and mk [
     (z3_expr_of_expr x env mk);
@@ -44,7 +47,8 @@ let rec z3_expr_of_expr expr env mk =
   | Add (x, y) -> Z3.Arithmetic.mk_add mk [(z3_expr_of_expr x env mk);(z3_expr_of_expr y env mk)]
   | Sub (x, y) -> Z3.Arithmetic.mk_sub mk [(z3_expr_of_expr x env mk);(z3_expr_of_expr y env mk)]
   | Mul (x, y) -> Z3.Arithmetic.mk_mul mk [(z3_expr_of_expr x env mk);(z3_expr_of_expr y env mk)]
-  | Div (x, y) -> Z3.Arithmetic.mk_div mk (z3_expr_of_expr x env mk) (z3_expr_of_expr y env mk);;
+  | Div (x, y) -> Z3.Arithmetic.mk_div mk (z3_expr_of_expr x env mk) (z3_expr_of_expr y env mk)
+;;
 
 (* let eval_bool expr env = *)
 (*   let mk = mk_context [] in *)
@@ -52,7 +56,7 @@ let rec z3_expr_of_expr expr env mk =
 (*       if bool_result == true then (Bool true) else (Bool false);; *)
 
 let eval_expr expr env =
-  let mk = mk_context [] in
+  let mk = (empty_context) in
     let result = Z3.Expr.to_string (solve_z3_expr (z3_expr_of_expr expr env mk) mk) in
     match result with
     | "true" -> Bool(true)

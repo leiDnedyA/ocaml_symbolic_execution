@@ -2,6 +2,7 @@
 type value =
   | Bool of bool
   | Int of int
+  | Sym of string
 ;;
 
 type expr =
