@@ -1,3 +1,4 @@
+open Z3;;
 
 type value =
   | Bool of bool
@@ -30,3 +31,10 @@ type stmt =
   | If of expr * int
   | Goto of int 
 ;;
+
+
+type state = {
+  env : ((string, Expr.expr) Hashtbl.t);
+  pc : int;
+  path : Expr.expr;
+} 

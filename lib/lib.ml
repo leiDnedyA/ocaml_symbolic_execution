@@ -111,9 +111,8 @@ let eval_stmt env pc stmt = (*env -> hashtable, pc -> program counter (line numb
     path: z3 boolean expression
 
  *)
-(* let eval_sym_stmt st mk cmd = *)
-(*   match cmd with *)
-(*   | Assign s e -> st.;; *)
+let eval_sym_stmt st mk cmd =
+  None;;
 
 (* Programs *)
 

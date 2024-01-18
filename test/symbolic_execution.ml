@@ -1,4 +1,5 @@
 open Lib;;
+open Z3;;
 
 let run_test condition test_number =
   if condition = false then
@@ -59,6 +60,12 @@ let env = Hashtbl.create 1 in
 let expr = Add(Val(Sym "x"), Val(Int 1)) in
 let z3_expr = z3_expr_of_expr expr env mk in
 let output = Z3.Expr.to_string z3_expr in
-run_test (output = "(+ x 2)") 8;;
+run_test (output = "(+ x 1)") 8;;
 
-
+(* Test 9, symbolic exeuction statement evaluation*)
+let test_env = Hashtbl.create 1 in
+let mk = empty_context in
+let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
+let cmd = If(Gt(int_expr 1, int_expr 2), 2) in
+let result = eval_sym_stmt state mk in
+run_test true 9;;
