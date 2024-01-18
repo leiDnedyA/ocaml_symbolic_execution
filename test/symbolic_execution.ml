@@ -53,11 +53,12 @@ let test_expr = And(Gt(int_expr 3, int_expr 1), Or(Val(Bool(true)), Val(Bool(fal
 let result = eval_expr_bool test_expr env in
 run_test (result = true) 7;;
 
-(* Test 7, Z3 Arithmetic const evaluation*)
+(* Test 8, Z3 Arithmetic const evaluation*)
 let mk = empty_context in
 let env = Hashtbl.create 1 in
 let expr = Add(Val(Sym "x"), Val(Int 1)) in
 let z3_expr = z3_expr_of_expr expr env mk in
-(* let result = solve_z3_expr z3_expr mk in *)
 let output = Z3.Expr.to_string z3_expr in
-print_endline output;;
+run_test (output = "(+ x 2)") 8;;
+
+

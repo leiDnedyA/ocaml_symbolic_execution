@@ -95,6 +95,25 @@ let eval_stmt env pc stmt = (*env -> hashtable, pc -> program counter (line numb
   | Goto (goto_pc) -> goto_pc
 ;;
 
+(* Takes a state and returns a tuple of one or two states
+   based on the following conditions
+   If -> If both t and f conditions are possible based on
+         the existing path, return both states.
+         If only one condition is possible, return only that 
+         state.
+         If neither is possible, fail
+   Goto -> Return existing state with updated program counter
+   Assign -> Assign the provided value in the environment
+
+   state record (st):
+    env: hashmap of strings to exprs
+    pc: program counter
+    path: z3 boolean expression
+
+ *)
+(* let eval_sym_stmt st mk cmd = *)
+(*   match cmd with *)
+(*   | Assign s e -> st.;; *)
 
 (* Programs *)
 
@@ -104,3 +123,7 @@ let rec eval_prgm env pc (prgm:stmt list) =
   else
     eval_prgm env (eval_stmt env pc (List.nth prgm pc)) prgm
 ;;
+
+(* let eval_sym_program p = *)
+(*   let mk = empty_context in *)
+(*   let rec *)
