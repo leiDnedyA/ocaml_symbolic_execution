@@ -62,10 +62,18 @@ let z3_expr = z3_expr_of_expr expr env mk in
 let output = Z3.Expr.to_string z3_expr in
 run_test (output = "(+ x 1)") 8;;
 
-(* Test 9, symbolic exeuction statement evaluation*)
+(* Test 9, symbolic exeuction GOTO statement evaluation*)
+let test_env = Hashtbl.create 1 in
+let mk = empty_context in
+let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
+let cmd = Goto(1) in
+let result = eval_sym_stmt state mk cmd in
+run_test (result.pc = 1) 9;;
+
+(* Test 10, symbolic execution IF statement evaluation*)
 let test_env = Hashtbl.create 1 in
 let mk = empty_context in
 let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
 let cmd = If(Gt(int_expr 1, int_expr 2), 2) in
-let result = eval_sym_stmt state mk in
-run_test true 9;;
+let result = eval_sym_stmt state mk cmd in
+run_test (result.pc = 1) 10;;

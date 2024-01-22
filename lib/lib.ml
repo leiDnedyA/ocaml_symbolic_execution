@@ -1,14 +1,9 @@
 open Z3;;
 include Types;;
+include Symbolic_expr;;
+include Util;;
 
 
-(* Aliases / helper functions *)
-
-let mk_numeral mk i = Z3.Arithmetic.Integer.mk_numeral_i mk i;;
-
-let int_expr i = Val(Int(i));;
-
-let empty_context = mk_context [];;
 
 (* Expressions *)
 
@@ -112,7 +107,21 @@ let eval_stmt env pc stmt = (*env -> hashtable, pc -> program counter (line numb
 
  *)
 let eval_sym_stmt st mk cmd =
-  None;;
+  match cmd with
+  | Assign (sym, expr) -> 
+      Hashtbl.replace st.env sym (z3_expr_of_sym_expr expr st.env mk);
+      {st with pc=st.pc + 1}
+  | Goto pc' -> {st with pc=pc'}
+  | If (expr, pc') -> 
+      failwith("Not yet implemented")
+      (* ( *)
+      (* match (eval_expr expr st.env) with *)
+      (* | Bool(true) -> {st with pc=pc'} *)
+      (* | Bool(false) -> {st with pc=st.pc + 1} *)
+      (* | _ -> failwith("Invalid boolean result") *)
+      (* ) *)
+
+;;
 
 (* Programs *)
 
