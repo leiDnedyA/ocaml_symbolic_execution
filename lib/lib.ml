@@ -151,6 +151,18 @@ let rec eval_prgm env pc (prgm:stmt list) =
     eval_prgm env (eval_stmt env pc (List.nth prgm pc)) prgm
 ;;
 
+let rec eval_sym_prgm mk prgm st =
+  let result = [] in
+  let eval_prgm = eval_sym_prgm mk prgm in
+  if st.pc >= List.length prgm then
+    [Expr.to_string st.path;]
+  else
+    let result' = eval_sym_stmt st mk (List.nth prgm st.pc) in
+    match result' with
+    | a, Some b -> List.concat [eval_prgm b; eval_prgm a;]
+    | a, None -> eval_prgm a
+    | _, _ -> failwith("Not yet implemented");;
+
 (* let eval_sym_program p = *)
 (*   let mk = empty_context in *)
 (*   let rec *)

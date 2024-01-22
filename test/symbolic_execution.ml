@@ -109,4 +109,17 @@ let result = eval_sym_stmt state mk cmd in
 let entry2 = extract_option (get_second_entry result) in
 let cond1 = ((get_first_entry result).pc = 20) in
 let cond2 = entry2.pc = 1 in
-run_test (cond1 && cond2) 11
+run_test (cond1 && cond2) 11;;
+
+(* Test 12, symbolic execution of entire program*)
+let test_env = Hashtbl.create 1 in
+let program = [
+  Assign("x", Val(Sym("x")));
+  If(Gt(int_expr 1, Var("x")), 3);
+] in
+let mk = empty_context in
+let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
+let result = eval_sym_prgm mk program state in
+let cond = (List.length result) = 2 in
+print_endline (List.nth result 0);
+run_test cond 12;;
