@@ -110,17 +110,36 @@ let eval_sym_stmt st mk cmd =
   match cmd with
   | Assign (sym, expr) -> 
       Hashtbl.replace st.env sym (z3_expr_of_sym_expr expr st.env mk);
-      {st with pc=st.pc + 1}
-  | Goto pc' -> {st with pc=pc'}
+      {st with pc=st.pc + 1}, None
+  | Goto pc' -> {st with pc=pc'}, None
   | If (expr, pc') -> 
-      failwith("Not yet implemented")
-      (* ( *)
-      (* match (eval_expr expr st.env) with *)
-      (* | Bool(true) -> {st with pc=pc'} *)
-      (* | Bool(false) -> {st with pc=st.pc + 1} *)
-      (* | _ -> failwith("Invalid boolean result") *)
-      (* ) *)
-
+      let z3_expr = z3_expr_of_sym_expr expr st.env mk in
+      let z3_not_expr = Boolean.mk_not mk z3_expr in
+      let true_path = Boolean.mk_and mk [st.path;z3_expr] in
+      let false_path = Boolean.mk_and mk [st.path;z3_not_expr] in
+      let st_f = {st with pc=st.pc+1; path=false_path} in
+      let st_t = {st with pc=pc'; path=true_path} in
+      let maybe_t =
+        begin
+          let solver = Solver.mk_simple_solver mk in
+          Solver.add solver [true_path];
+          Solver.check solver [];
+        end in
+      let maybe_f =
+        begin
+          let solver = Solver.mk_simple_solver mk in
+          Solver.add solver [false_path];
+          Solver.check solver [];
+        end in        
+      match maybe_t, maybe_f with
+      | Solver.SATISFIABLE, Solver.SATISFIABLE ->
+        st_t, Some(st_f)
+      | Solver.SATISFIABLE, Solver.UNSATISFIABLE ->
+        st_t, None
+      | Solver.UNSATISFIABLE, Solver.SATISFIABLE ->
+        st_f, None
+      | Solver.UNSATISFIABLE, Solver.UNSATISFIABLE -> failwith("Impossible")
+      | _ -> failwith("Not implemented.")
 ;;
 
 (* Programs *)

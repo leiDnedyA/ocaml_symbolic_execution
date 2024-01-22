@@ -4,11 +4,26 @@ open Z3;;
 let run_test condition test_number =
   if condition = false then
     failwith(Printf.sprintf
-    "Test %d failed, issue with assign statement eval.\n"
+    "Test %d failed.\n"
     test_number)
   else
     None;;
 
+let get_first_entry t =
+  match t with
+  | v, _ -> v
+;;
+
+let get_second_entry t =
+  match t with
+  | _, v -> v
+;;
+
+let extract_option o =
+  match o with
+  | Some v -> v
+  | None -> failwith("None option provided")
+;;
 
 (* Test 1, Assign stmt*)
 let env_1 = Hashtbl.create 1;;
@@ -68,12 +83,30 @@ let mk = empty_context in
 let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
 let cmd = Goto(1) in
 let result = eval_sym_stmt state mk cmd in
-run_test (result.pc = 1) 9;;
+run_test ((get_first_entry result).pc = 1) 9;;
 
 (* Test 10, symbolic execution IF statement evaluation*)
 let test_env = Hashtbl.create 1 in
 let mk = empty_context in
 let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
-let cmd = If(Gt(int_expr 1, int_expr 2), 2) in
+let true_pc = 20 in
+let cmd = If(Gt(int_expr 1, int_expr 2), true_pc) in
 let result = eval_sym_stmt state mk cmd in
-run_test (result.pc = 1) 10;;
+let entry2 = get_second_entry result in
+let cond1 = ((get_first_entry result).pc = 1) in
+let cond2 = (entry2 = None) in
+run_test (cond1 && cond2) 10;;
+
+(* Test 11, symbolic execution IF statement evaluation w two vald paths*)
+let test_env = Hashtbl.create 1 in
+let mk = empty_context in
+let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
+let true_pc = 20 in
+let assn = Assign("x", Val(Sym("x"))) in
+let cmd = If(Gt(int_expr 1, Var("x")), true_pc) in
+let _ = eval_sym_stmt state mk assn in
+let result = eval_sym_stmt state mk cmd in
+let entry2 = extract_option (get_second_entry result) in
+let cond1 = ((get_first_entry result).pc = 20) in
+let cond2 = entry2.pc = 1 in
+run_test (cond1 && cond2) 11
