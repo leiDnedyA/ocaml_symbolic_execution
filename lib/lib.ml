@@ -142,7 +142,7 @@ let eval_sym_stmt st mk cmd =
       | _ -> failwith("Not implemented.")
 ;;
 
-(* Programs *)
+(* Program evaluation (normal and symbolic) *)
 
 let rec eval_prgm env pc (prgm:stmt list) = 
   if (pc >= List.length prgm) then
@@ -161,7 +161,7 @@ let rec eval_sym_prgm mk prgm st =
     match result' with
     | a, Some b -> List.concat [eval_prgm b; eval_prgm a;]
     | a, None -> eval_prgm a
-    | _, _ -> failwith("Not yet implemented");;
+    | _, _ -> failwith("Invalid result");;
 
 (* let eval_sym_program p = *)
 (*   let mk = empty_context in *)

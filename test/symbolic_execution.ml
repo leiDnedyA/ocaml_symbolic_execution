@@ -121,5 +121,5 @@ let mk = empty_context in
 let state = {env=test_env; pc=0; path=(Boolean.mk_true mk)} in
 let result = eval_sym_prgm mk program state in
 let cond = (List.length result) = 2 in
-print_endline (List.nth result 0);
+(* List.iter (fun result -> print_endline result) result; *)
 run_test cond 12;;
